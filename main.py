@@ -27,3 +27,28 @@ class Node(object):
 
 if __name__ == "__main__":
     print("Hi!")
+
+
+#
+# Debug utilities
+#
+
+# I'd prefer a chain of operations piped sequentially.
+# But, here, the processing starts from the inner loop
+# I can't join cells in a row, before they are converted to strings
+def state_str(st: State) -> str:
+    def row_to_str(row: Iterable[int]):
+        row = [str(num) for num in row]
+        return "".join(row)
+
+    return "\n".join(row_to_str(row) for row in st)
+
+
+def print_state(st: State) -> None:
+    print(state_str(st))
+
+
+def print_states(states: Iterable[State]):
+    for st in states:
+        print_state(st)
+        print()
