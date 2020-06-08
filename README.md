@@ -6,4 +6,4 @@ Resulting graph:
 
 ![PNG](tic-tac-toe_game_state_graph.png)
 
-Higher resolution [PDF version](https://www.dropbox.com/s/c9yuoujhf5i2qoc/tic-tac-toe_game_state_graph.pdf?dl=0)
+Higher resolution [PDF version](tic-tac-toe_game_state_graph.pdf)
