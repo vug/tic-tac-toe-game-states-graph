@@ -147,3 +147,70 @@ def get_next_states_raw(st: State, step: int) -> List[State]:
                 new_st = make_move(st, row, col, new_val)
                 next_states.append(new_st)
     return next_states
+
+
+if __name__ == "__main__":
+    empty_board_state = ((0, 0, 0), (0, 0, 0), (0, 0, 0))
+    # index from states (hashable since tuple) to symmetry group ids
+    states = {}
+    # index from symmetry group id to actual groups
+    groups = {}
+    # index from symmetry group id to Node that hold them in the DAG
+    nodes = {}
+    # Incremental counter of GroupIds
+    gid = 1
+
+    def add_symmetry_group(st: State, gid: GroupId):
+        """Compute symmetry group, update global state.
+
+        Should be called when a new unique state is encountered.
+        Register computed group into `groups` via given `gid`.
+        Store the belonging of the states of the group in `states.
+        """
+        global states, groups
+        assert gid not in groups
+        symmetry_group = get_symmetries(st)
+        groups[gid] = symmetry_group
+        states.update({st: gid for st in symmetry_group})
+
+    # Handle initial state
+    add_symmetry_group(empty_board_state, gid)
+    root = Node(gid)
+    nodes[gid] = root
+    gid += 1
+    q = deque([root])
+
+    def compute_and_queue_successors(nd: Node) -> None:
+        global groups, nodes, q, gid
+        sym_group = groups[nd.val]
+        # first state of a group is its representative state
+        canonical_state = sym_group[0]
+        next_states = get_next_states_raw(canonical_state, step)
+        for nxt_st in next_states:
+            # have seen/processed this state before?
+            if nxt_st in states:
+                gid_old = states[nxt_st]
+                # merge this path with other paths leading to this node
+                # if it is not already merged (i.e. if not a successor
+                # of current node)
+                if gid_old not in [suc.val for suc in nd.successors]:
+                    nd.successors.append(nodes[gid_old])
+                continue
+            # is it an unseen/unprocessed state?
+            add_symmetry_group(nxt_st, gid)
+            new_nd = Node(gid)
+            nodes[gid] = new_nd
+            nd.successors.append(new_nd)
+            q.appendleft(new_nd)
+            gid += 1
+
+    # BDS from root Node.
+    print("step, unique_state_no")
+    for step in range(11):
+        print(f"{step}, {len(q)}")
+        for _ in range(len(q)):
+            compute_and_queue_successors(q.pop())
+
+    print("Graph size (game-state complexity):", len(nodes))
+    # print_states([groups[nd.val][0] for nd in root.successors])
+    # print_states([groups[nd.val][0] for nd in root.successors[2].successors])
