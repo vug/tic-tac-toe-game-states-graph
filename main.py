@@ -214,3 +214,42 @@ if __name__ == "__main__":
     print("Graph size (game-state complexity):", len(nodes))
     # print_states([groups[nd.val][0] for nd in root.successors])
     # print_states([groups[nd.val][0] for nd in root.successors[2].successors])
+
+    # Plot graph
+    edges = []  # List[(GraphId, GraphId)]
+
+    def traverse(nd):
+        global edges
+        edges.extend([(nd.val, s.val) for s in nd.successors])
+        for s in nd.successors:
+            traverse(s)
+
+    traverse(root)
+
+    import networkx as nx
+
+    G = nx.DiGraph()
+    G.add_edges_from(edges)
+    pos = nx.nx_agraph.graphviz_layout(G, prog="dot")
+
+    import matplotlib
+    from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+    import matplotlib.pyplot as plt
+
+    levels = [0, 1, 2, 3]
+    colors = ["gray", "blue", "red"]
+    cmap, norm = matplotlib.colors.from_levels_and_colors(levels, colors)
+
+    fig, ax = plt.subplots(figsize=(50, 10))
+    for gid, (x, y) in pos.items():
+        sym_grp = groups[gid]
+        state = sym_grp[0]
+        node_image = OffsetImage(state, zoom=3.0, cmap=cmap, norm=norm)
+        box = AnnotationBbox(node_image, (x, y), frameon=False, pad=0.1)
+        ax.add_artist(box)
+    nx.draw(
+        G, pos, with_labels=False, arrows=True, width=0.2, ax=ax, node_size=1, alpha=0.5
+    )
+    plt.tight_layout()
+    plt.savefig("tic-tac-toe_game_state_graph.pdf", dpi=300)
+    plt.savefig("tic-tac-toe_game_state_graph.png", dpi=150)
