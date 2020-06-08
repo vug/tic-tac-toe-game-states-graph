@@ -4,6 +4,6 @@ Code to compute unique game states of Tic-Tac-Toe game. Repo is to accompany my 
 
 Resulting graph:
 
-![PNG](https://www.dropbox.com/s/ticfv5tcken0zeb/tic-tac-toe_game_state_graph.png?dl=1)
+![PNG](tic-tac-toe_game_state_graph.png)
 
 Higher resolution [PDF version](https://www.dropbox.com/s/c9yuoujhf5i2qoc/tic-tac-toe_game_state_graph.pdf?dl=0)
